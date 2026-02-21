@@ -37,6 +37,7 @@
     "@pinecone-database/pinecone": "^2.0.1",
     "@prisma/client": "5.3.1",
     "@qdrant/js-client-rest": "^1.9.0",
+    "@simplewebauthn/server": "^13.2.2",
     "@xenova/transformers": "^2.14.0",
     "@zilliz/milvus2-sdk-node": "^2.3.5",
     "adm-zip": "^0.5.16",
@@ -85,7 +86,8 @@
     "uuid-apikey": "^1.5.3",
     "weaviate-ts-client": "^1.4.0",
     "web-push": "^3.6.7",
-    "winston": "^3.13.0"
+    "winston": "^3.13.0",
+    "zod": "^4.3.6"
   },
   "resolutions": {
     "**/graphql-request/form-data": "3.0.4",

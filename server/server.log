@@ -1,0 +1,42 @@
+
+> anything-llm-server@1.11.0 dev
+> cross-env NODE_ENV=development nodemon --ignore documents --ignore vector-cache --ignore storage --ignore swagger --trace-warnings index.js
+
+[33m[nodemon] 2.0.22[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,json[39m
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+[36m[EncryptionManager][0m Self-assigning key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+prisma:info Starting a sqlite pool with 9 connections.
+[33m[TELEMETRY STUBBED][0m Anonymous Telemetry stubbed in development.
+[36m[CommunicationKey][0m RSA key pair generated for signed payloads within AnythingLLM services.
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[36m[PushNotifications][0m Loaded existing VAPID keys!
+[36m[BackgroundWorkerService][0m Starting...
+[36m[BackgroundWorkerService][0m Service started with 1 jobs [ 'cleanup-orphan-documents' ]
+[36m[PushNotifications][0m Loading single user mode subscriptions...
+Primary server in HTTP mode listening on port 3001
+prisma:info Starting a sqlite pool with 9 connections.
+[33m[9588:10397][0m: No direct uploads path found - exiting.
+[33m[9588:10397][0m: No direct uploads path found - exiting. { service: 'bg-worker', origin: 'cleanup-orphan-documents' }
+Child process exited with code 0 and signal null
+Worker for job "cleanup-orphan-documents" exited with code 0 undefined
+[32m[nodemon] restarting due to changes...[39m
+Gracefully exiting { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+Gracefully exited { code: 'SIGUSR2', ignore_hook: true, hide_meta: true }
+[32m[nodemon] starting `node --trace-warnings index.js`[39m
+[36m[EncryptionManager][0m Self-assigning key & salt for encrypting arbitrary data.
+[35m[TokenManager][0m Initialized new TokenManager instance for model: gpt-3.5-turbo
+[35m[TokenManager][0m Returning existing instance for model: gpt-3.5-turbo
+prisma:info Starting a sqlite pool with 9 connections.
+[33m[TELEMETRY STUBBED][0m Anonymous Telemetry stubbed in development.
+[36m[CommunicationKey][0m RSA key pair generated for signed payloads within AnythingLLM services.
+[36m[EncryptionManager][0m Loaded existing key & salt for encrypting arbitrary data.
+[36m[PushNotifications][0m Loaded existing VAPID keys!
+[36m[BackgroundWorkerService][0m Starting...
+[36m[BackgroundWorkerService][0m Service started with 1 jobs [ 'cleanup-orphan-documents' ]
+[36m[PushNotifications][0m Loading single user mode subscriptions...
+Primary server in HTTP mode listening on port 3001
