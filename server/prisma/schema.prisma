@@ -85,6 +85,20 @@ model users {
   prompt_history               prompt_history[]
   desktop_mobile_devices       desktop_mobile_devices[]
   workspace_parsed_files       workspace_parsed_files[]
+  webauthn_credentials         webauthn_credentials[]
+}
+
+model webauthn_credentials {
+  id           Int      @id @default(autoincrement())
+  credentialID String   @unique
+  publicKey    String
+  counter      BigInt
+  transports   String?
+  userId       Int
+  createdAt    DateTime @default(now())
+  user         users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model recovery_codes {

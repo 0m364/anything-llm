@@ -181,6 +181,7 @@ export default function MultiUserAuth() {
   const [showRecoveryForm, setShowRecoveryForm] = useState(false);
   const [showResetPasswordForm, setShowResetPasswordForm] = useState(false);
   const [customAppName, setCustomAppName] = useState(null);
+  const [username, setUsername] = useState("");
 
   const {
     isOpen: isRecoveryCodeModalOpen,
@@ -214,6 +215,29 @@ export default function MultiUserAuth() {
       setLoading(false);
     }
     setLoading(false);
+  };
+
+  const handlePasskeyLogin = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const { WebAuthn } = await import("@/utils/webauthn");
+      const { verified, token, user } = await WebAuthn.login(username);
+      if (verified && !!token && !!user) {
+        setUser(user);
+        setToken(token);
+        window.localStorage.setItem(AUTH_USER, JSON.stringify(user));
+        window.localStorage.setItem(AUTH_TOKEN, token);
+        window.location = paths.home();
+      } else {
+        setError("Login failed");
+      }
+    } catch (e) {
+      console.error(e);
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDownloadComplete = () => setDownloadComplete(true);
@@ -313,6 +337,8 @@ export default function MultiUserAuth() {
                 className="border-none bg-zinc-800 light:bg-slate-200 text-zinc-200 light:text-zinc-600 text-sm rounded-lg p-2.5 w-[300px] h-[34px] focus:outline-none focus:ring-1 focus:ring-sky-300"
                 required={true}
                 autoComplete="off"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div className="w-full px-0 flex flex-col gap-y-2">
@@ -339,6 +365,14 @@ export default function MultiUserAuth() {
             {loading
               ? t("login.multi-user.validating")
               : t("login.multi-user.login")}
+          </button>
+          <button
+            disabled={loading}
+            type="button"
+            onClick={handlePasskeyLogin}
+            className="text-white bg-transparent hover:bg-zinc-800 light:text-slate-950 light:hover:bg-slate-200 border border-white light:border-slate-400 text-sm font-semibold rounded-lg h-[34px] w-full"
+          >
+            Login with Passkey
           </button>
           <button
             type="button"

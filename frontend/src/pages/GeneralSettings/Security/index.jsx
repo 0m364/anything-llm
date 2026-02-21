@@ -31,6 +31,53 @@ export default function GeneralSecurity() {
         </div>
         <MultiUserMode />
         <PasswordProtection />
+        <PasskeyProtection />
+      </div>
+    </div>
+  );
+}
+
+function PasskeyProtection() {
+  const [registering, setRegistering] = useState(false);
+  const { t } = useTranslation();
+
+  const handleRegister = async () => {
+    setRegistering(true);
+    try {
+      const { WebAuthn } = await import("@/utils/webauthn");
+      const success = await WebAuthn.register();
+      if (success) {
+        showToast("Passkey registered successfully!", "success");
+      } else {
+        showToast("Failed to register passkey.", "error");
+      }
+    } catch (e) {
+      console.error(e);
+      showToast(`Error: ${e.message}`, "error");
+    } finally {
+      setRegistering(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col w-full px-1 md:pl-6 md:pr-[50px]">
+      <div className="w-full flex flex-col gap-y-1 pb-6 border-white light:border-theme-sidebar-border border-b-2 border-opacity-10">
+        <div className="w-full flex flex-col gap-y-1">
+          <div className="items-center flex gap-x-4">
+            <p className="text-base font-bold text-white mt-6">
+              Passkeys (Biometric Login)
+            </p>
+          </div>
+          <p className="text-xs leading-[18px] font-base text-white text-opacity-60">
+            Enable passwordless login using your device's biometric sensors (FaceID, TouchID) or security keys.
+            Useful for accessible and secure login.
+          </p>
+        </div>
+        <div className="relative w-full max-h-full mt-4">
+          <CTAButton onClick={handleRegister} disabled={registering}>
+            {registering ? "Registering..." : "Register New Passkey"}
+          </CTAButton>
+        </div>
       </div>
     </div>
   );
