@@ -414,6 +414,7 @@ export default function GeneralLLMPreference() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredLLMs, setFilteredLLMs] = useState([]);
+  const [filteredFallbackLLMs, setFilteredFallbackLLMs] = useState([]);
   const [selectedLLM, setSelectedLLM] = useState(null);
   const [selectedFallbackLLM, setSelectedFallbackLLM] = useState(null);
   const [searchMenuOpen, setSearchMenuOpen] = useState(false);
@@ -507,6 +508,23 @@ export default function GeneralLLMPreference() {
       llm.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredLLMs(filtered);
+
+    const offlineProviders = [
+      "ollama",
+      "lmstudio",
+      "localai",
+      "koboldcpp",
+      "textgenwebui",
+      "docker-model-runner",
+      "foundry",
+      "generic-openai",
+    ];
+    const filteredFallback = AVAILABLE_LLM_PROVIDERS.filter(
+      (llm) =>
+        offlineProviders.includes(llm.value) &&
+        llm.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredFallbackLLMs(filteredFallback);
   }, [searchQuery, selectedLLM]);
 
   const selectedLLMObject = AVAILABLE_LLM_PROVIDERS.find(
@@ -594,7 +612,7 @@ export default function GeneralLLMPreference() {
                         />
                       </div>
                       <div className="flex-1 pl-4 pr-2 flex flex-col gap-y-1 overflow-y-auto white-scrollbar pb-4 max-h-[245px]">
-                        {filteredLLMs.map((llm) => {
+                        {filteredFallbackLLMs.map((llm) => {
                           return (
                             <LLMItem
                               key={llm.name}
