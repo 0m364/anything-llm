@@ -40,3 +40,8 @@ prisma:info Starting a sqlite pool with 9 connections.
 [36m[BackgroundWorkerService][0m Service started with 1 jobs [ 'cleanup-orphan-documents' ]
 [36m[PushNotifications][0m Loading single user mode subscriptions...
 Primary server in HTTP mode listening on port 3001
+prisma:info Starting a sqlite pool with 9 connections.
+[33m[12445:12946][0m: No direct uploads path found - exiting.
+[33m[12445:12946][0m: No direct uploads path found - exiting. { service: 'bg-worker', origin: 'cleanup-orphan-documents' }
+Child process exited with code 0 and signal null
+Worker for job "cleanup-orphan-documents" exited with code 0 undefined
