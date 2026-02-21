@@ -9,6 +9,14 @@ const KEY_MAPPING = {
     envKey: "LLM_PROVIDER",
     checks: [isNotEmpty, supportedLLM],
   },
+  LLMFallbackProvider: {
+    envKey: "LLM_FALLBACK_PROVIDER",
+    checks: [supportedLLM],
+  },
+  LLMFallbackModelPref: {
+    envKey: "LLM_FALLBACK_MODEL_PREF",
+    checks: [],
+  },
   // OpenAI Settings
   OpenAiKey: {
     envKey: "OPEN_AI_KEY",

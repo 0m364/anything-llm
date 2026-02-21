@@ -239,39 +239,118 @@ async function streamChatWithWorkspace(
     rawHistory
   );
 
-  // If streaming is not explicitly enabled for connector
-  // we do regular waiting of a response and send a single chunk.
-  if (LLMConnector.streamingEnabled() !== true) {
-    console.log(
-      `\x1b[31m[STREAMING DISABLED]\x1b[0m Streaming is not available for ${LLMConnector.constructor.name}. Will use regular chat method.`
-    );
-    const { textResponse, metrics: performanceMetrics } =
-      await LLMConnector.getChatCompletion(messages, {
+  try {
+    // If streaming is not explicitly enabled for connector
+    // we do regular waiting of a response and send a single chunk.
+    if (LLMConnector.streamingEnabled() !== true) {
+      console.log(
+        `\x1b[31m[STREAMING DISABLED]\x1b[0m Streaming is not available for ${LLMConnector.constructor.name}. Will use regular chat method.`
+      );
+      const { textResponse, metrics: performanceMetrics } =
+        await LLMConnector.getChatCompletion(messages, {
+          temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
+          user: user,
+        });
+
+      completeText = textResponse;
+      metrics = performanceMetrics;
+      writeResponseChunk(response, {
+        uuid,
+        sources,
+        type: "textResponseChunk",
+        textResponse: completeText,
+        close: true,
+        error: false,
+        metrics,
+      });
+    } else {
+      const stream = await LLMConnector.streamGetChatCompletion(messages, {
         temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
         user: user,
       });
+      completeText = await LLMConnector.handleStream(response, stream, {
+        uuid,
+        sources,
+      });
+      metrics = stream.metrics;
+    }
+  } catch (e) {
+    // If the primary LLM failed, check if we have a fallback configured.
+    // We only try fallback if the workspace does not have a specific provider overrides
+    // OR if the workspace is using the system default provider.
+    // Actually, if workspace has override, we should probably respect that and not fallback?
+    // User requested "fall back offline models".
+    // Let's allow fallback if system setting is present.
+    const fallbackProvider = process.env.LLM_FALLBACK_PROVIDER;
+    if (!!fallbackProvider) {
+      console.error(
+        `Primary LLM failed. Attempting fallback to ${fallbackProvider}. Error: ${e.message}`
+      );
+      try {
+        const FallbackConnector = getLLMProvider({
+          provider: fallbackProvider,
+          model: process.env.LLM_FALLBACK_MODEL_PREF,
+        });
 
-    completeText = textResponse;
-    metrics = performanceMetrics;
-    writeResponseChunk(response, {
-      uuid,
-      sources,
-      type: "textResponseChunk",
-      textResponse: completeText,
-      close: true,
-      error: false,
-      metrics,
-    });
-  } else {
-    const stream = await LLMConnector.streamGetChatCompletion(messages, {
-      temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
-      user: user,
-    });
-    completeText = await LLMConnector.handleStream(response, stream, {
-      uuid,
-      sources,
-    });
-    metrics = stream.metrics;
+        // We need to re-compress messages for the fallback provider because token limits might differ
+        const fallbackMessages = await FallbackConnector.compressMessages(
+          {
+            systemPrompt: await chatPrompt(workspace, user),
+            userPrompt: updatedMessage,
+            contextTexts,
+            chatHistory,
+            attachments,
+          },
+          rawHistory
+        );
+
+        if (FallbackConnector.streamingEnabled() !== true) {
+          const { textResponse, metrics: performanceMetrics } =
+            await FallbackConnector.getChatCompletion(fallbackMessages, {
+              temperature:
+                workspace?.openAiTemp ?? FallbackConnector.defaultTemp,
+              user: user,
+            });
+
+          completeText = textResponse;
+          metrics = performanceMetrics;
+          writeResponseChunk(response, {
+            uuid,
+            sources,
+            type: "textResponseChunk",
+            textResponse: completeText,
+            close: true,
+            error: false,
+            metrics,
+          });
+        } else {
+          const stream = await FallbackConnector.streamGetChatCompletion(
+            fallbackMessages,
+            {
+              temperature:
+                workspace?.openAiTemp ?? FallbackConnector.defaultTemp,
+              user: user,
+            }
+          );
+          completeText = await FallbackConnector.handleStream(
+            response,
+            stream,
+            {
+              uuid,
+              sources,
+            }
+          );
+          metrics = stream.metrics;
+        }
+      } catch (fallbackError) {
+        console.error(
+          `Fallback LLM failed. Error: ${fallbackError.message}`
+        );
+        throw e; // Throw the original error to be handled by the outer catch
+      }
+    } else {
+      throw e;
+    }
   }
 
   if (completeText?.length > 0) {

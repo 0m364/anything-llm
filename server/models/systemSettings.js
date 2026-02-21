@@ -64,6 +64,10 @@ const SystemSettings = {
 
     // Hub settings
     "hub_api_key",
+
+    // Fallback LLM settings
+    "fallback_llm_provider",
+    "fallback_llm_model_pref",
   ],
   validations: {
     footer_data: (updates) => {
@@ -256,6 +260,8 @@ const SystemSettings = {
       // --------------------------------------------------------
       LLMProvider: llmProvider,
       LLMModel: getBaseLLMProviderModel({ provider: llmProvider }) || null,
+      LLMFallbackProvider: process.env.LLM_FALLBACK_PROVIDER || null,
+      LLMFallbackModelPref: process.env.LLM_FALLBACK_MODEL_PREF || null,
       ...this.llmPreferenceKeys(),
 
       // --------------------------------------------------------
